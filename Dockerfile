@@ -12,10 +12,10 @@ RUN apk add --update git \
     && mvn package \
     && cp ./target/kafdrop-*.jar /usr/local/bin/kafdrop.jar \
     && mvn clean \
-    && rm -fr /tmp/Kafdrop /tmp/master.zip \
+    && rm -rf /tmp/Kafdrop \
     && echo ""
 
-CMD java -jar /usr/local/bin/kafdrop.jar \
+ENTRYPOINT java -jar /usr/local/bin/kafdrop.jar \
       --zookeeper.connect=${ZK_HOSTS} \
       --server.port=${KAFDROP_PORT} --schemaregistry.connect=${SCHEMA_REGISTRY} \
       --message.format=${MSG_FORMAT}
