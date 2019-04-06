@@ -1,21 +1,17 @@
 FROM maven:alpine
 
-ENV ZK_HOSTS=localhost:2181 \
-    KAFDROP_PORT=9000 \
-    SCHEMA_REGISTRY=http://localhost:8081 \
-    MSG_FORMAT=DEFAULT 
+ENV ZK_HOSTS localhost:2181 
+ENV KAFDROP_PORT 9000 
+ENV SCHEMA_REGISTRY http://localhost:8081 
+ENV MSG_FORMAT DEFAULT 
 
-RUN apk add --update git \
-    && cd /tmp \
-    && git clone https://github.com/HomeAdvisor/Kafdrop.git \
-    && cd /tmp/Kafdrop \
-    && mvn package \
-    && cp ./target/kafdrop-*.jar /usr/local/bin/kafdrop.jar \
-    && mvn clean \
-    && rm -rf /tmp/Kafdrop \
-    && echo ""
+RUN apk add --update git 
+RUN cd /tmp && git clone https://github.com/HomeAdvisor/Kafdrop.git 
+RUN cd /tmp/Kafdrop && mvn clean package
+RUN cp /tmp/Kafdrop/target/kafdrop*.jar /usr/local/bin/kafdrop.jar 
+# RUN rm -rf /tmp/Kafdrop
+# RUN java -version
+RUN ls -al /usr/local/bin/
 
-ENTRYPOINT java -jar /usr/local/bin/kafdrop.jar \
-      --zookeeper.connect=${ZK_HOSTS} \
-      --server.port=${KAFDROP_PORT} --schemaregistry.connect=${SCHEMA_REGISTRY} \
-      --message.format=${MSG_FORMAT}
+ENTRYPOINT ["java", "-jar", "/usr/local/bin/kafdrop.jar"]
+CMD ["--zookeeper.connect=${ZK_HOSTS}","--server.port=${KAFDROP_PORT}","--schemaregistry.connect=${SCHEMA_REGISTRY}","--message.format=${MSG_FORMAT}"]
